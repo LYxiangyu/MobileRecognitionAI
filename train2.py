@@ -6,8 +6,8 @@ from torchvision import transforms
 from PIL import Image
 import os
 import numpy as np
-from sklearn.model_selection import train_test_split
-
+from sklearn.metrics import accuracy_score
+import logging
 
 # 定义一个简单的卷积神经网络
 class SimpleCNN(nn.Module):
@@ -21,10 +21,10 @@ class SimpleCNN(nn.Module):
         self.fc2 = nn.Linear(512, num_classes)
 
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
+        x = self.pool(torch.relu(self.conv1(x)))
+        x = self.pool(torch.relu(self.conv2(x)))
         x = x.view(-1, 64 * 160 * 160)  # Adjusted for 640x640 input images
-        x = F.relu(self.fc1(x))
+        x = torch.relu(self.fc1(x))
         x = self.fc2(x)
         return x
 
@@ -92,9 +92,25 @@ def validate(model, val_loader, criterion, device):
     return running_loss / len(val_loader), correct / total
 
 
+# 测试函数
+def test(model, test_loader, device):
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            inputs, labels = inputs.to(device), labels.to(device)
+            outputs = model(inputs)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+    return correct / total
+
+
 if __name__ == '__main__':
     # 设置设备
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logging.info(f"Using device: {device}")
 
     # 数据预处理
     transform = transforms.Compose([
@@ -103,24 +119,51 @@ if __name__ == '__main__':
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    # 加载数据集
-    dataset = CustomDataset('./dataset', transform=transform)
-    train_dataset, val_dataset = train_test_split(dataset, test_size=0.2, random_state=42, stratify=dataset.targets)
+    # 加载训练集、验证集和测试集
+    train_dataset = CustomDataset('./dataset/train', transform=transform)
+    val_dataset = CustomDataset('./dataset/val', transform=transform)
+    test_dataset = CustomDataset('./dataset/test', transform=transform)
+
     train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=8)
     val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, num_workers=8)
+    test_loader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_workers=8)
 
     # 初始化模型、损失函数和优化器
-    model = SimpleCNN(num_classes=len(dataset.classes)).to(device)
+    num_classes = len(train_dataset.classes)
+    model = SimpleCNN(num_classes=num_classes).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # 训练模型
     num_epochs = 10
-    for epoch in range(num_epochs):
-        print(f'Epoch [{epoch + 1}/{num_epochs}]')
-        train_loss = train(model, train_loader, criterion, optimizer, device)
-        val_loss, val_acc = validate(model, val_loader, criterion, device)
-        print(f'Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}')
+    best_val_acc = 0.0
+    best_model_path = './runs/classify/train2/weights/best2.pth'
+    os.makedirs(os.path.dirname(best_model_path), exist_ok=True)
 
-    # 保存模型
-    torch.save(model.state_dict(), './runs/classify/train2/weights/best.pth')
+    for epoch in range(num_epochs):
+        logging.info(f'Epoch [{epoch + 1}/{num_epochs}]')
+
+        # 训练
+        train_loss = train(model, train_loader, criterion, optimizer, device)
+        logging.info(f'Train Loss: {train_loss:.4f}')
+
+        # 验证
+        val_loss, val_acc = validate(model, val_loader, criterion, device)
+        logging.info(f'Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}')
+
+        # 保存最佳模型
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            torch.save(model.state_dict(), best_model_path)
+            logging.info(f'Saved best model with validation accuracy: {best_val_acc:.4f}')
+
+    # 测试模型
+    model.load_state_dict(torch.load(best_model_path))
+    test_acc = test(model, test_loader, device)
+    logging.info(f'Test Acc: {test_acc:.4f}')
+
+    # 保存类别名称到文件
+    with open('./runs/classify/train2/classes.txt', 'w') as f:
+        for cls_name in train_dataset.classes:
+            f.write(f"{cls_name}\n")
+    logging.info("Saved class names to classes.txt")
