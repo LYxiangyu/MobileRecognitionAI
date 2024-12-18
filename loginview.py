@@ -7,14 +7,17 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButt
 from qfluentwidgets import LineEdit, PrimaryPushButton, CheckBox, BodyLabel, setThemeColor, isDarkTheme
 from PyQt5.QtGui import QPixmap, QIcon
 
+from TransView import Demo3
+
 
 class LoginWindow(QWidget):
     """ 登录界面 """
 
     loginSuccess = pyqtSignal(str)  # 登录成功信号，传递用户名
 
-    def __init__(self, parent=None):
+    def __init__(self,main_window, parent=None):
         super().__init__(parent)
+        self.main_window = main_window  # 接收主界面引用
         # 设置对象名称
         self.setObjectName("login_interface")  # 为 LoginWindow 设置唯一的对象名称
         # 创建主布局 (水平布局)
@@ -32,12 +35,6 @@ class LoginWindow(QWidget):
 
         self.setWindowTitle('手机型号识别')
         self.setWindowIcon(QIcon(':/qfluentwidgets/images/logo.png'))
-        # 设置窗口效果，移除背景样式
-        if isDarkTheme():
-            self.setStyleSheet("background-color: transparent;")  # 移除背景样式
-        else:
-            # 如果不是暗黑模式，则设置白色背景
-            self.setStyleSheet("background-color: white;")
 
         # 连接按钮点击事件
         self.pushButton.clicked.connect(self.onLoginClicked)
@@ -47,27 +44,11 @@ class LoginWindow(QWidget):
         image_layout = QVBoxLayout()
         image_layout.setAlignment(Qt.AlignCenter)
 
-        # 获取当前文件所在的目录
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(current_dir, 'UI/resource/logo/background.jpg')
-
-        # 打印图片路径以进行调试
-        print("Image path:", image_path)
-
-        # 加载并设置图片
         self.image_label = QLabel(self)
-        pixmap = QPixmap(image_path)
-
-        # 检查图片是否成功加载
-        if pixmap.isNull():
-            print("Failed to load image:", image_path)
-        else:
-            print("Image loaded successfully")
-
+        pixmap = QPixmap('UI/resource/logo/background.jpg')
         self.image_label.setPixmap(pixmap.scaled(1000, 650, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         image_layout.addWidget(self.image_label)
 
-        # 将图片布局添加到主布局中
         self.main_layout.addLayout(image_layout)
 
     def createFormSection(self):
@@ -75,63 +56,33 @@ class LoginWindow(QWidget):
         form_layout = QVBoxLayout()
         form_layout.setAlignment(Qt.AlignCenter)
 
-        # 创建 Logo 图片部分
-        logo_layout = QVBoxLayout()
-        logo_layout.setAlignment(Qt.AlignCenter)  # 使 Logo 居中显示
-
-        # 获取当前文件所在的目录
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        logo_image_path = os.path.join(current_dir, 'UI/resource/logo/kunkun.png')  # 使用与左侧相同的图片路径
-
-        # 打印 Logo 图片路径以进行调试
-        print("Logo image path:", logo_image_path)
-
-        # 加载并设置 Logo 图片
+        # Logo
         self.logo_label = QLabel(self)
-        logo_pixmap = QPixmap(logo_image_path)
-
-        # 检查 Logo 图片是否成功加载
-        if logo_pixmap.isNull():
-            print("Failed to load logo image:", logo_image_path)
-        else:
-            print("Logo image loaded successfully")
-
+        logo_pixmap = QPixmap('UI/resource/logo/kunkun.png')
         self.logo_label.setPixmap(logo_pixmap.scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        logo_layout.addWidget(self.logo_label)
+        form_layout.addWidget(self.logo_label)
 
-        # 将 Logo 布局添加到表单布局的顶部
-        form_layout.addLayout(logo_layout)
-
-        # 添加欢迎标题
-        welcome_label = BodyLabel("欢迎回来！")
+        # 欢迎标题
+        welcome_label = QLabel("欢迎回来！")
         welcome_label.setAlignment(Qt.AlignCenter)
         welcome_label.setStyleSheet("font-size: 24px; font-weight: bold;")
         form_layout.addWidget(welcome_label)
-
-        # 添加一些间距
-        form_layout.addSpacing(30)
 
         # 登录按钮
         self.pushButton = PrimaryPushButton("登录")
         form_layout.addWidget(self.pushButton)
 
-        # 将表单布局添加到主布局中
         self.main_layout.addLayout(form_layout)
-        # self.enableTransparentBackground()
 
     def onLoginClicked(self):
         """ 登录按钮点击事件 """
-        # 这里可以根据需要实现登录逻辑
         self.showSuccess("默认用户")
+        self.hide()  # 隐藏登录窗口
+        self.main_window.show()  # 显示主界面
 
     def showSuccess(self, username):
         """ 显示登录成功提示并发出信号 """
-
         self.loginSuccess.emit(username)
-
-    def showError(self, message):
-        """ 显示错误提示 """
-        QMessageBox.critical(self, "登录失败", message)
 
 if __name__ == '__main__':
     # enable dpi scale
@@ -143,6 +94,9 @@ if __name__ == '__main__':
     # setTheme(Theme.DARK)
 
     app = QApplication(sys.argv)
-    w3 = LoginWindow()
-    w3.show()
+    main_window = Demo3()
+
+    # 创建登录窗口并传递主窗口引用
+    login_window = LoginWindow(main_window)
+    login_window.show()
     app.exec_()
