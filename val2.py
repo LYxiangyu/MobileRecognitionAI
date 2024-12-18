@@ -1,9 +1,10 @@
 import torch
 from torchvision import transforms
 from PIL import Image
-import numpy as np
-import logging
 import os
+import logging
+import numpy as np
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from train2 import SimpleCNN  # 直接从 train2.py 导入 SimpleCNN 模型
 
 # 设置日志记录
@@ -24,17 +25,40 @@ def predict(image_path, model, transform, device, classes):
         output = model(image)
         probs = torch.softmax(output, dim=1)
         pred = torch.argmax(probs, dim=1)
-        prob = probs[0, pred].item()
-    return classes[pred.item()], prob
+    return pred.item()
+
+
+def evaluate_model(test_dir, model, transform, device, classes):
+    """评估模型在测试集上的性能"""
+    true_labels = []
+    predicted_labels = []
+
+    for class_name in os.listdir(test_dir):
+        class_dir = os.path.join(test_dir, class_name)
+        if not os.path.isdir(class_dir):
+            continue
+
+        class_idx = classes.index(class_name)
+        for image_name in os.listdir(class_dir):
+            image_path = os.path.join(class_dir, image_name)
+            if os.path.isfile(image_path):
+                pred_label = predict(image_path, model, transform, device, classes)
+                true_labels.append(class_idx)
+                predicted_labels.append(pred_label)
+
+    # 计算各类指标
+    accuracy = accuracy_score(true_labels, predicted_labels)
+    precision = precision_score(true_labels, predicted_labels, average='weighted', zero_division=0)
+    recall = recall_score(true_labels, predicted_labels, average='weighted', zero_division=0)
+    f1 = f1_score(true_labels, predicted_labels, average='weighted', zero_division=0)
+
+    return accuracy, precision, recall, f1
 
 
 if __name__ == '__main__':
     # 设置设备
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logging.info(f"Using device: {device}")
-
-    # 定义图像路径（直接在代码中设置）
-    image_path = 'dataset/1734425537661.jpg'  # 替换为你的图像路径
 
     # 加载类别名称
     classes_file = './runs/classify/train2/classes.txt'
@@ -61,8 +85,19 @@ if __name__ == '__main__':
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    # 进行预测
-    prediction, probability = predict(image_path, model, transform, device, classes)
-    logging.info(f"Predicted class: {prediction}, Probability: {probability:.4f}")
+    # 测试集路径
+    test_dir = './dataset/test'  # 替换为你的测试集路径
 
-    print(f"Predicted class: {prediction}, Probability: {probability:.4f}")
+    # 评估模型
+    accuracy, precision, recall, f1 = evaluate_model(test_dir, model, transform, device, classes)
+
+    # 打印评估结果
+    logging.info(f"Accuracy: {accuracy:.4f}")
+    logging.info(f"Precision: {precision:.4f}")
+    logging.info(f"Recall: {recall:.4f}")
+    logging.info(f"F1 Score: {f1:.4f}")
+
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall: {recall:.4f}")
+    print(f"F1 Score: {f1:.4f}")
