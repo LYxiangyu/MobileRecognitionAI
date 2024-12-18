@@ -9,21 +9,22 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 import logging
 
-# 定义一个简单的卷积神经网络
+# 定义一个简化的卷积神经网络
 class SimpleCNN(nn.Module):
     def __init__(self, num_classes=10):
         super(SimpleCNN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        # 减少卷积层的通道数
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1)  # 将 32 减少到 16
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, padding=1)  # 将 64 减少到 32
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
-        # After two pooling layers, the size of the feature map will be 160x160
-        self.fc1 = nn.Linear(64 * 160 * 160, 512)  # Adjusted for 640x640 input images
-        self.fc2 = nn.Linear(512, num_classes)
+        # 调整全连接层的输入尺寸
+        self.fc1 = nn.Linear(32 * 160 * 160, 256)  # 将 512 减少到 256
+        self.fc2 = nn.Linear(256, num_classes)
 
     def forward(self, x):
         x = self.pool(torch.relu(self.conv1(x)))
         x = self.pool(torch.relu(self.conv2(x)))
-        x = x.view(-1, 64 * 160 * 160)  # Adjusted for 640x640 input images
+        x = x.view(-1, 32 * 160 * 160)  # 调整为 32 * 160 * 160
         x = torch.relu(self.fc1(x))
         x = self.fc2(x)
         return x
@@ -114,7 +115,7 @@ if __name__ == '__main__':
 
     # 数据预处理
     transform = transforms.Compose([
-        transforms.Resize((640, 640)),  # Resize to 640x640
+        transforms.Resize((640, 640)),  # 保持原始图像尺寸
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
@@ -124,9 +125,10 @@ if __name__ == '__main__':
     val_dataset = CustomDataset('./dataset/val', transform=transform)
     test_dataset = CustomDataset('./dataset/test', transform=transform)
 
-    train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=8)
-    val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, num_workers=8)
-    test_loader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_workers=8)
+    # 减少批量大小
+    train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, num_workers=8)  # 将 batch_size 从 4 减少到 2
+    val_loader = DataLoader(val_dataset, batch_size=2, shuffle=False, num_workers=8)
+    test_loader = DataLoader(test_dataset, batch_size=2, shuffle=False, num_workers=8)
 
     # 初始化模型、损失函数和优化器
     num_classes = len(train_dataset.classes)
