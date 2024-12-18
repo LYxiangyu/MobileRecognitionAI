@@ -1,5 +1,5 @@
 import sys
-
+from qfluentwidgets import FluentIcon as FIF, NavigationAvatarWidget
 from PyQt5.QtCore import Qt, QPropertyAnimation, QSize, QRect, QPoint, QUrl, pyqtSignal
 from PyQt5.QtGui import QIcon, QColor, QFont, QPainter
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication, QGraphicsOpacityEffect, QHBoxLayout
@@ -276,12 +276,12 @@ class Demo3(MSFluentWindow):
         # 连接按钮点击信号到启动训练
         self.appInterface.start_training_signal.connect(self.on_start_training)
         # add sub interfaces
-        self.addSubInterface(self.appInterface, FluentIcon.LIBRARY, "训练", FluentIcon.LIBRARY_FILL, isTransparent=True)
-        self.navigationInterface.addItem("editInterface", FluentIcon.EDIT, "编辑", selectable=False)
-
-        self.navigationInterface.addItem(
-            "settingInterface", FluentIcon.SETTING, "设置", position=NavigationItemPosition.BOTTOM, selectable=False)
-
+        # self.addSubInterface(self.appInterface, FluentIcon.LIBRARY, "训练", FluentIcon.LIBRARY_FILL, isTransparent=True)
+        # self.navigationInterface.addItem("editInterface", FluentIcon.EDIT, "编辑", selectable=False)
+        #
+        # self.navigationInterface.addItem(
+        #     "settingInterface", FluentIcon.SETTING, "设置", position=NavigationItemPosition.BOTTOM, selectable=False)
+        self.initNavigation()
         self.resize(880, 760)
         self.setWindowTitle('手机型号识别')
         self.setWindowIcon(QIcon(':/qfluentwidgets/images/logo.png'))
@@ -298,6 +298,10 @@ class Demo3(MSFluentWindow):
     def on_training_finished(self):
         print("Training has finished.")
         # 在这里可以更新界面，如禁用按钮或显示结果
+    def initNavigation(self):
+        self.addSubInterface(self.appInterface, FluentIcon.LIBRARY, "训练", FluentIcon.LIBRARY_FILL, isTransparent=True)
+        # self.addSubInterface( FIF.SETTING, 'Settings', NavigationItemPosition.BOTTOM)
+        # self.stackWidget.setCurrentIndex(1)
 
 if __name__ == '__main__':
     # enable dpi scale
