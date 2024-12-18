@@ -16,7 +16,6 @@ class ValMainInfoCard(SimpleCardWidget):
 
         self.nameLabel = TitleLabel('开始验证吧！', self)
         self.startButton = PrimaryPushButton('Start', self)
-        self.startButton.clicked.connect(self.on_start_button_clicked)  # 连接按钮点击事件
         self.companyLabel = HyperlinkLabel(
             QUrl('https://github.com/LYxiangyu/MobileRecognitionAI'), 'Xiangyu2233 && Wugaga_233', self)
         self.startButton.setFixedWidth(160)
@@ -102,13 +101,13 @@ class DescriptionCard(HeaderCardWidget):
         super().__init__(parent)
         self.descriptionLabel = BodyLabel(
             '', self)
-
+        self.vBoxLayout = QVBoxLayout(self.view)
         self.descriptionLabel.setWordWrap(True)
         self.viewLayout.addWidget(self.descriptionLabel)
         self.setTitle('数据验证')
         self.setBorderRadius(8)
 
-class VialView(ScrollArea):
+class ValView(ScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.view = QWidget(self)
@@ -117,3 +116,13 @@ class VialView(ScrollArea):
         self.valMainInfoCard = ValMainInfoCard(self)
         self.valSettinsCard = ValSettinsCard(self)
         self.descriptionCard = DescriptionCard(self)
+        self.setWidget(self.view)
+        self.setWidgetResizable(True)
+        self.setObjectName("valView")
+
+        self.vBoxLayout.setSpacing(10)
+        self.vBoxLayout.setContentsMargins(0, 0, 10, 30)
+        self.vBoxLayout.addWidget(self.valMainInfoCard, 0, Qt.AlignTop)
+        self.vBoxLayout.addWidget(self.valSettinsCard, 0, Qt.AlignTop)
+        self.vBoxLayout.addWidget(self.descriptionCard, 0, Qt.AlignTop)
+        self.enableTransparentBackground()
