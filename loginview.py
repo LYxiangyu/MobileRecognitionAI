@@ -1,6 +1,9 @@
 import os
+import sys
+
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QGridLayout, QMessageBox, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QGridLayout, QMessageBox, \
+    QSizePolicy, QApplication
 from qfluentwidgets import LineEdit, PrimaryPushButton, CheckBox, BodyLabel, setThemeColor, isDarkTheme
 from PyQt5.QtGui import QPixmap, QIcon
 
@@ -27,6 +30,8 @@ class LoginWindow(QWidget):
         # 创建右侧表单部分
         self.createFormSection()
 
+        self.setWindowTitle('手机型号识别')
+        self.setWindowIcon(QIcon(':/qfluentwidgets/images/logo.png'))
         # 设置窗口效果，移除背景样式
         if isDarkTheme():
             self.setStyleSheet("background-color: transparent;")  # 移除背景样式
@@ -44,7 +49,7 @@ class LoginWindow(QWidget):
 
         # 获取当前文件所在的目录
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(current_dir, 'background.jpg')
+        image_path = os.path.join(current_dir, 'UI/resource/logo/background.jpg')
 
         # 打印图片路径以进行调试
         print("Image path:", image_path)
@@ -76,7 +81,7 @@ class LoginWindow(QWidget):
 
         # 获取当前文件所在的目录
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        logo_image_path = os.path.join(current_dir, 'kunkun.png')  # 使用与左侧相同的图片路径
+        logo_image_path = os.path.join(current_dir, 'UI/resource/logo/kunkun.png')  # 使用与左侧相同的图片路径
 
         # 打印 Logo 图片路径以进行调试
         print("Logo image path:", logo_image_path)
@@ -112,6 +117,7 @@ class LoginWindow(QWidget):
 
         # 将表单布局添加到主布局中
         self.main_layout.addLayout(form_layout)
+        # self.enableTransparentBackground()
 
     def onLoginClicked(self):
         """ 登录按钮点击事件 """
@@ -126,3 +132,17 @@ class LoginWindow(QWidget):
     def showError(self, message):
         """ 显示错误提示 """
         QMessageBox.critical(self, "登录失败", message)
+
+if __name__ == '__main__':
+    # enable dpi scale
+    QApplication.setHighDpiScaleFactorRoundingPolicy(
+        Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+
+    # setTheme(Theme.DARK)
+
+    app = QApplication(sys.argv)
+    w3 = LoginWindow()
+    w3.show()
+    app.exec_()

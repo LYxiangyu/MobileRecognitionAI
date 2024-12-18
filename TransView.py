@@ -10,6 +10,7 @@ from qfluentwidgets import CardWidget, MSFluentWindow, FluentIcon, NavigationIte
 from qfluentwidgets.components.widgets.acrylic_label import AcrylicBrush
 
 from ValView import ValView
+from predictview import PredictView
 from train import startTraining, TrainingThread
 
 
@@ -270,6 +271,7 @@ class Demo3(MSFluentWindow):
 
         self.appInterface = AppInterface(self)
         self.valView = ValView(self)
+        self.predictview = PredictView(self)
         # 初始化训练线程
         self.training_thread = TrainingThread()
         self.training_thread.training_started.connect(self.on_training_started)
@@ -302,7 +304,8 @@ class Demo3(MSFluentWindow):
         # 在这里可以更新界面，如禁用按钮或显示结果
     def initNavigation(self):
         self.addSubInterface(self.appInterface, FluentIcon.LIBRARY, "训练", FluentIcon.LIBRARY_FILL, isTransparent=True)
-        self.addSubInterface(self.valView, FluentIcon.LIBRARY, "验证", FluentIcon.LIBRARY_FILL, isTransparent=False)
+        self.addSubInterface(self.valView, FluentIcon.LIBRARY, "验证", FluentIcon.LIBRARY_FILL, isTransparent=True)
+        self.addSubInterface(self.predictview, FluentIcon.LIBRARY, "验证", FluentIcon.LIBRARY_FILL, isTransparent=True)
         # self.addSubInterface( FIF.SETTING, 'Settings', NavigationItemPosition.BOTTOM)
         # self.stackWidget.setCurrentIndex(1)
 

@@ -77,23 +77,6 @@ class ValMainInfoCard(SimpleCardWidget):
         self.vBoxLayout.addLayout(self.buttonLayout)
         self.buttonLayout.addWidget(self.tagButton, 0, Qt.AlignLeft)
 
-class ValSettinsCard(GroupHeaderCardWidget):
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setTitle("基本设置")
-        self.setBorderRadius(8)
-
-        self.chooseButton = PushButton("选择")
-        self.comboBox = ComboBox()
-        self.lineEdit = SearchLineEdit()
-
-        self.chooseButton.setFixedWidth(120)
-        self.lineEdit.setFixedWidth(320)
-        self.comboBox.setFixedWidth(320)
-        self.lineEdit.setPlaceholderText("默认100")
-        self.addGroup("resource/Python.svg", "训练轮数", "请填写训练轮数", self.lineEdit)
-
 class DescriptionCard(HeaderCardWidget):
     """ Description card """
 
@@ -114,7 +97,6 @@ class ValView(ScrollArea):
 
         self.vBoxLayout = QVBoxLayout(self.view)
         self.valMainInfoCard = ValMainInfoCard(self)
-        self.valSettinsCard = ValSettinsCard(self)
         self.descriptionCard = DescriptionCard(self)
         self.setWidget(self.view)
         self.setWidgetResizable(True)
@@ -123,6 +105,5 @@ class ValView(ScrollArea):
         self.vBoxLayout.setSpacing(10)
         self.vBoxLayout.setContentsMargins(0, 0, 10, 30)
         self.vBoxLayout.addWidget(self.valMainInfoCard, 0, Qt.AlignTop)
-        self.vBoxLayout.addWidget(self.valSettinsCard, 0, Qt.AlignTop)
         self.vBoxLayout.addWidget(self.descriptionCard, 0, Qt.AlignTop)
         self.enableTransparentBackground()
