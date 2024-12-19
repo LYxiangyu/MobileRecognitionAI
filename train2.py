@@ -138,7 +138,7 @@ if __name__ == '__main__':
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # 训练模型
-    num_epochs = 10
+    num_epochs = 100
     best_val_acc = 0.0
     best_model_path = './runs/classify/train2/weights/best2.pth'
     os.makedirs(os.path.dirname(best_model_path), exist_ok=True)
