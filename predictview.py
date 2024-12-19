@@ -114,7 +114,7 @@ class ResultCard(SimpleCardWidget):
         # 运行手写模型推理
         handwritten_prediction, handwritten_probability = self.predict_handwritten_model(self.image_path)
         if handwritten_prediction:
-            self.handwritten_result = f"手写模型: {handwritten_prediction}"
+            self.handwritten_result = f"ResNet-152模型: {handwritten_prediction}"
             self.update_final_result()
 
     def update_result(self, result):

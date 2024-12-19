@@ -194,7 +194,7 @@ class ValView(ScrollArea):
     def update_handwritten_result(self, accuracy, precision, recall, f1):
         """更新手写模型的验证结果"""
         self.handwritten_result = (
-            f"手写模型验证结果：\n"
+            f"ResNet-152模型验证结果：\n"
             f"准确率: {accuracy:.4f}\n"
             f"精确率: {precision:.4f}\n"
             f"召回率: {recall:.4f}\n"
