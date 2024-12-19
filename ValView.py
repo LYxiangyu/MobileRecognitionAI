@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import SimpleCardWidget, ImageLabel, TitleLabel, PrimaryPushButton, HyperlinkLabel, \
     VerticalSeparator, BodyLabel, PillPushButton, setFont, GroupHeaderCardWidget, PushButton, ComboBox, SearchLineEdit, \
     HeaderCardWidget, ScrollArea
-from torchvision import transforms
+from torchvision import transforms, models
 from ultralytics import YOLO
 
 from train2 import SimpleCNN
@@ -53,7 +53,7 @@ class ValMainInfoCard(SimpleCardWidget):
     start_training_signal = pyqtSignal()
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.iconLabel = ImageLabel(":/qfluentwidgets/images/logo.png", self)
+        self.iconLabel = ImageLabel("UI/resource/logo/验证.jpg", self)
         self.iconLabel.setBorderRadius(8, 8, 8, 8)
         self.iconLabel.scaledToWidth(120)
 
@@ -165,27 +165,28 @@ class ValView(ScrollArea):
         """开始两个模型的验证"""
         self.descriptionCard.descriptionLabel.setText("正在验证，请稍候...")
 
-        # 加载手写模型
+        # Load handwritten model
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         classes = load_classes('./runs/classify/train2/classes.txt')
-        model = SimpleCNN(num_classes=len(classes)).to(device)
-        model.load_state_dict(torch.load('./runs/classify/train2/weights/best2.pth', map_location=device))
+        model = models.resnet152(pretrained=False)
+        num_ftrs = model.fc.in_features
+        model.fc = torch.nn.Linear(num_ftrs, len(classes))
+        model = model.to(device)
+        model.load_state_dict(torch.load('./runs/classify/train2/weights/best3.pth', map_location=device))
         model.eval()
 
         transform = transforms.Compose([
-            transforms.Resize((640, 640)),
+            transforms.Resize((224, 224)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
 
-        # 手写模型验证线程
         self.handwritten_thread = HandwrittenModelThread(
-            './dataset/test', model, transform, device, classes
+            './dataset/val', model, transform, device, classes
         )
         self.handwritten_thread.finished_signal.connect(self.update_handwritten_result)
         self.handwritten_thread.start()
 
-        # YOLO 模型验证线程
         self.yolo_thread = YOLOModelThread('./runs/classify/train/weights/best.pt')
         self.yolo_thread.finished_signal.connect(self.update_yolo_result)
         self.yolo_thread.start()

@@ -19,7 +19,7 @@ class AppInfoCard(SimpleCardWidget):
     start_training_signal = pyqtSignal()
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.iconLabel = ImageLabel(":/qfluentwidgets/images/logo.png", self)
+        self.iconLabel = ImageLabel("UI/resource/logo/训练.jpg", self)
         self.iconLabel.setBorderRadius(8, 8, 8, 8)
         self.iconLabel.scaledToWidth(120)
 
@@ -288,7 +288,7 @@ class Demo3(MSFluentWindow):
         self.initNavigation()
         self.resize(880, 760)
         self.setWindowTitle('手机型号识别')
-        self.setWindowIcon(QIcon(':/qfluentwidgets/images/logo.png'))
+        self.setWindowIcon(QIcon('UI/resource/logo/icon.png'))
 
         self.titleBar.raise_()
 
@@ -303,9 +303,9 @@ class Demo3(MSFluentWindow):
         print("Training has finished.")
         # 在这里可以更新界面，如禁用按钮或显示结果
     def initNavigation(self):
-        self.addSubInterface(self.appInterface, FluentIcon.LIBRARY, "训练", FluentIcon.LIBRARY_FILL, isTransparent=True)
-        self.addSubInterface(self.valView, FluentIcon.LIBRARY, "验证", FluentIcon.LIBRARY_FILL, isTransparent=True)
-        self.addSubInterface(self.predictview, FluentIcon.LIBRARY, "验证", FluentIcon.LIBRARY_FILL, isTransparent=True)
+        self.addSubInterface(self.appInterface, FluentIcon.ROBOT, "训练",  isTransparent=True)
+        self.addSubInterface(self.valView, FluentIcon.PENCIL_INK, "验证",  isTransparent=True)
+        self.addSubInterface(self.predictview, FluentIcon.SEARCH, "识别",  isTransparent=True)
         # self.addSubInterface( FIF.SETTING, 'Settings', NavigationItemPosition.BOTTOM)
         # self.stackWidget.setCurrentIndex(1)
 

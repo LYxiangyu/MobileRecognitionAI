@@ -13,7 +13,7 @@ from PyQt5.QtCore import Qt, pyqtSignal, QThread
 from qfluentwidgets import (
     PrimaryPushButton, CardWidget, FluentIcon, setTheme, Theme, InfoBar, InfoBarPosition, ScrollArea, SimpleCardWidget
 )
-from torchvision import transforms
+from torchvision import transforms, models
 from ultralytics import YOLO
 
 from predict2 import load_classes
@@ -145,15 +145,19 @@ class ResultCard(SimpleCardWidget):
         self.classes = load_classes(classes_file)
         num_classes = len(self.classes)
 
-        # 加载模型
-        model = SimpleCNN(num_classes=num_classes).to(device)
-        model_path = './runs/classify/train2/weights/best2.pth'
+        # 加载 ResNet-152 模型
+        model = models.resnet152(pretrained=False)
+        num_ftrs = model.fc.in_features
+        model.fc = torch.nn.Linear(num_ftrs, num_classes)
+        model = model.to(device)
+
+        model_path = './runs/classify/train2/weights/best3.pth'
         if not os.path.exists(model_path):
             logging.error(f"Model file not found at {model_path}")
             return None
         model.load_state_dict(torch.load(model_path, map_location=device))
         model.eval()
-        logging.info(f"Loaded handwritten model from {model_path}")
+        logging.info(f"Loaded ResNet-152 model from {model_path}")
         return model
 
     def predict_handwritten_model(self, image_path):
@@ -163,7 +167,7 @@ class ResultCard(SimpleCardWidget):
 
         # 数据预处理
         transform = transforms.Compose([
-            transforms.Resize((640, 640)),  # Resize to 640x640
+            transforms.Resize((224, 224)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])

@@ -23,7 +23,7 @@ class LoginWindow(QWidget):
         # 创建主布局 (水平布局)
         self.main_layout = QHBoxLayout(self)
         self.setLayout(self.main_layout)
-
+        self.resize(1000,650)
         # 确保布局可以扩展
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -34,7 +34,7 @@ class LoginWindow(QWidget):
         self.createFormSection()
 
         self.setWindowTitle('手机型号识别')
-        self.setWindowIcon(QIcon(':/qfluentwidgets/images/logo.png'))
+        self.setWindowIcon(QIcon('UI/resource/logo/icon.png'))
 
         # 连接按钮点击事件
         self.pushButton.clicked.connect(self.onLoginClicked)
