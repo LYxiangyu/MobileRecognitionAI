@@ -203,7 +203,7 @@ def main():
     early_stopping = EarlyStopping(patience=10, verbose=True, path='./runs/classify/train2/weights/best3.pth')
 
     # 训练模型
-    model, history = train_model(model, criterion, optimizer, dataloaders, dataset_sizes, device, num_epochs=30,
+    model, history = train_model(model, criterion, optimizer, dataloaders, dataset_sizes, device, num_epochs=60,
                                  early_stopping=early_stopping)
 
     # 保存模型
