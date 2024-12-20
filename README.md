@@ -3,7 +3,7 @@
 这只是个简单的模型，应对实训课的要求，上传给学弟学妹们提供方便。
 当然，将数据源一换，也可以改造为其他识别。
 ## 模型：
-- YOLO11 [官网链接](https://docs.ultralytics.com/zh/models/yolo11/#usage-examples)
+- YOLO11 [官网链接](https://docs.ultralytics.com/zh/models/yolo11/#usage-examples) 感谢[AnyMoonS](https://github.com/AnyMoonS)推荐
 - ResNet152 模型太大无法上传，需要手动训练
 ## 界面：
 使用pyqt，组件使用[QFluentWidgets](https://qfluentwidgets.com/)，界面精美
