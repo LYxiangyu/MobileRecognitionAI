@@ -18,7 +18,7 @@
 - ultralytics
 - PyQt-Fluent-Widgets
 - numpy
-- openCV
+- openCV     
 可能并不全面，请根据代码安装。
 ### 启动
 运行loginview.py启动，如要训练，ResNet训练在train3.py，YOLO训练可通过UI界面启动，数据集请提前放在dataset。数据集格式如下
