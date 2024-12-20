@@ -4,7 +4,7 @@
 当然，将数据源一换，也可以改造为其他识别。
 ## 模型：
 - YOLO11 [官网链接](https://docs.ultralytics.com/zh/models/yolo11/#usage-examples)
-- ResNet152
+- ResNet152 模型太大无法上传，需要手动训练
 ## 界面：
 使用pyqt，组件使用[QFluentWidgets](https://qfluentwidgets.com/)，界面精美
 ## 数据集
